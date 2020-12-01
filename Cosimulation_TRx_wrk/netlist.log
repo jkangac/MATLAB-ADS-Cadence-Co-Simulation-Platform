@@ -1,0 +1,175 @@
+; Top Design: "Cosimulation_TRx_lib:System_TEST:schematic"
+; Netlisted using Hierarchy Policy: "Standard"
+
+Options ResourceUsage=yes UseNutmegFormat=no EnableOptim=no TopDesignName="Cosimulation_TRx_lib:System_TEST:schematic" DcopOutputNodeVoltages=yes DcopOutputPinCurrents=yes DcopOutputAllSweepPoints=no DcopOutputDcopType=0
+; Library Name: Sinks
+; Cell Name: SpectrumAnalyzer
+; View Name: schematic
+define SpectrumAnalyzer ( N__1 ) 
+parameters  Plot=0  RLoad=DefaultRLoad  RTemp=DefaultRTemp  Start=DefaultTimeStart  Stop=DefaultTimeStop  Window=0  WindowConstant=0.0  Bias=1  FStart=0.0  FStop=100e9  NumFreqs=0  NPoints=0  Overlap=0 
+_vKeysightEEsof_dTSDF_n_x5fSpectrumAnalyzer_ltsdfsinks:S1  N__1 Plot=Plot RLoad=RLoad RTemp=RTemp Start=Start Stop=Stop Window=Window WindowConstant=WindowConstant Bias=Bias FStart=FStart FStop=FStop NumFreqs=NumFreqs NPoints=NPoints Overlap=Overlap 
+R:R1  N__1 0 R=RLoad Temp=RTemp 
+end SpectrumAnalyzer
+
+; Library Name: Sinks
+; Cell Name: TimedDataWrite
+; View Name: schematic
+define TimedDataWrite ( N__1 ) 
+parameters  Start=DefaultTimeStart  Stop=DefaultTimeStop  RLoad=DefaultRLoad  RTemp=DefaultRTemp  ControlSimulation=1  FileName="" FileType=0 
+_vKeysightEEsof_dTSDF_nTimedDataWrite2_ltsdfgemstars:T1  N__1 RLoad=RLoad RTemp=RTemp Start=Start Stop=Stop ControlSimulation=ControlSimulation FileName=FileName FileType=FileType 
+R:R1  N__1 0 R=RLoad Temp=RTemp 
+end TimedDataWrite
+
+; Library Name: Sinks
+; Cell Name: TimedSink
+; View Name: schematic
+define TimedSink ( N__1 ) 
+parameters  Plot=0  RLoad=DefaultRLoad  RTemp=DefaultRTemp  Start=DefaultTimeStart  Stop=DefaultTimeStop  ControlSimulation=1 
+R:R1  N__1 0 R=RLoad Temp=RTemp 
+_vKeysightEEsof_dTSDF_n_x5fTimedSink_ltsdfsinks:T1  N__1 Plot=Plot RLoad=RLoad RTemp=RTemp Start=Start Stop=Stop ControlSimulation=ControlSimulation 
+end TimedSink
+
+; Library Name: Cosimulation_TRx_lib
+; Cell Name: Transceiver
+; View Name: schematic
+define Transceiver ( P1  P2  P3  P4  P5  P6 ) 
+;parameters 
+R:R3  N__32 N__62 R=50 Ohm Noise=yes 
+#uselib "ckt" , "LPF_Butterworth"
+LPF_Butterworth:LPF1  P1 N__9 Fpass=ChipRate+12 MHz Apass=0.04 dB Fstop=ChipRate+15 MHz Astop=8 dB StopType="open" N=6 IL=0 dB Qu=1E308 Z1=50 Ohm Z2=50 Ohm 
+#uselib "sml" , "Amplifier2"
+Amplifier2:PA  N__63 P6 S21=dbpolar(10,0) S11=polar(0,0) S22=polar(0,180) S12=0 GainCompType=0 ReferToInput=0 GainCompSat=5.0 dB GainComp=1.0 dB ClipDataFile=1 
+V_Source:SRC8  N__4 0 Type="VtSine" V[1]=if (_tr_state == 0) then (1 V)*exp(j*2*pi*((-90)/360-(0 nsec)*(Fc)-.25)-(time-(0 nsec))*(0))*step((time-(0 nsec))+tinyreal) else 0 endif Freq[1]=Fc Vdc=0 V V_Tran=if (_tr_state == 1) then damped_sin(time,0,1 V,Fc,max(0,0 nsec),0,-90) else (1 V)*step(((0 nsec)-time)-tinyreal)*sin(pi*(-90)/180) endif SaveCurrent=1 
+#uselib "ckt" , "IsolatorSML"
+IsolatorSML:ISO1  P6 N__23 Loss1=0. dB Loss2=0. dB Loss3=0. dB Loss4=0. dB VSWR1=1. VSWR2=1. VSWR3=1. VSWR4=1. Isolat=100. dB Z1=50 Ohm Z2=50 Ohm CheckPassivity=1 
+#uselib "ckt" , "PwrSplit2"
+PwrSplit2:PWR2  N__7 N__43 N__0 SP21=0.707 SP31=0.707 SP11=0. SP22=0.  Isolation=100. dB ZRef=50. Ohm CheckPassivity=1 
+#uselib "ckt" , "PwrSplit2"
+PwrSplit2:PWR3  P5 N__28 N__60 SP21=0.707 SP31=0.707 SP11=0. SP22=0.  Isolation=100. dB ZRef=50. Ohm CheckPassivity=1 
+#uselib "sml" , "VMult"
+VMult:MULT2  N__47 N__12 N__60 R1=50 Ohm R2=50 Ohm R3=50 Ohm L31=0 dB L32=0 dB Linear=0 
+R:R2  N__12 N__37 R=50 Ohm Noise=yes 
+#uselib "sml" , "VMult"
+VMult:MULT1  N__9 N__58 N__28 R1=50 Ohm R2=50 Ohm R3=50 Ohm L31=0 dB L32=0 dB Linear=0 
+#uselib "sml" , "Amplifier2"
+Amplifier2:LNA  V1 N__7 S21=dbpolar(10,0) S11=polar(0,0) S22=polar(0,180) S12=0 NF=3 dB GainCompType=0 ReferToInput=0 GainCompSat=5.0 dB GainComp=1.0 dB ClipDataFile=1 
+V_Source:SRC11  N__45 0 Type="VtSine" V[1]=if (_tr_state == 0) then (1 V)*exp(j*2*pi*((0)/360-(0 nsec)*(Fc)-.25)-(time-(0 nsec))*(0))*step((time-(0 nsec))+tinyreal) else 0 endif Freq[1]=Fc Vdc=0 V V_Tran=if (_tr_state == 1) then damped_sin(time,0,1 V,Fc,max(0,0 nsec),0,0) else (1 V)*step(((0 nsec)-time)-tinyreal)*sin(pi*(0)/180) endif SaveCurrent=1 
+#uselib "sml" , "VMult"
+VMult:MULT4  N__0 N__49 N__5 R1=50 Ohm R2=50 Ohm R3=50 Ohm L31=0 dB L32=0 dB Linear=0 
+R:R1  N__58 N__4 R=50 Ohm Noise=yes 
+#uselib "ckt" , "LinkLOS"
+LinkLOS:LINK2  N__23 V1 CenterFreq=Fc BW=ChipRate+200 MHz TxGain=0 dB TxVSWR=1 RxGain=0 dB RxVSWR=1 RxNoiseTemp=150 PathLength=10 m Z1=50 Ohm Z2=50 Ohm 
+V_Source:SRC10  N__62 0 Type="VtSine" V[1]=if (_tr_state == 0) then (1 V)*exp(j*2*pi*((-90)/360-(0 nsec)*(Fc)-.25)-(time-(0 nsec))*(0))*step((time-(0 nsec))+tinyreal) else 0 endif Freq[1]=Fc Vdc=0 V V_Tran=if (_tr_state == 1) then damped_sin(time,0,1 V,Fc,max(0,0 nsec),0,-90) else (1 V)*step(((0 nsec)-time)-tinyreal)*sin(pi*(-90)/180) endif SaveCurrent=1 
+V_Source:SRC9  N__37 0 Type="VtSine" V[1]=if (_tr_state == 0) then (1 V)*exp(j*2*pi*((0)/360-(0 nsec)*(Fc)-.25)-(time-(0 nsec))*(0))*step((time-(0 nsec))+tinyreal) else 0 endif Freq[1]=Fc Vdc=0 V V_Tran=if (_tr_state == 1) then damped_sin(time,0,1 V,Fc,max(0,0 nsec),0,0) else (1 V)*step(((0 nsec)-time)-tinyreal)*sin(pi*(0)/180) endif SaveCurrent=1 
+#uselib "sml" , "Amplifier2"
+Amplifier2:Driver  P5 N__63 S21=dbpolar(20,0) S11=polar(0,0) S22=polar(0,180) S12=0 GainCompType=0 ReferToInput=0 GainCompSat=5.0 dB GainComp=1.0 dB ClipDataFile=1 
+R:R4  N__49 N__45 R=50 Ohm Noise=yes 
+#uselib "ckt" , "LPF_Butterworth"
+LPF_Butterworth:LPF4  N__5 P4 Fpass=ChipRate+12 MHz Apass=0.04 dB Fstop=ChipRate+15 MHz Astop=8 dB StopType="open" N=6 IL=0 dB Qu=1E308 Z1=50 Ohm Z2=50 Ohm 
+#uselib "ckt" , "LPF_Butterworth"
+LPF_Butterworth:LPF2  P2 N__47 Fpass=ChipRate+12 MHz Apass=0.04 dB Fstop=ChipRate+15 MHz Astop=8 dB StopType="open" N=6 IL=0 dB Qu=1E308 Z1=50 Ohm Z2=50 Ohm 
+#uselib "ckt" , "LPF_Butterworth"
+LPF_Butterworth:LPF3  N__41 P3 Fpass=ChipRate+12 MHz Apass=0.04 dB Fstop=ChipRate+15 MHz Astop=8 dB StopType="open" N=6 IL=0 dB Qu=1E308 Z1=50 Ohm Z2=50 Ohm 
+#uselib "sml" , "VMult"
+VMult:MULT3  N__43 N__32 N__41 R1=50 Ohm R2=50 Ohm R3=50 Ohm L31=0 dB L32=0 dB Linear=0 
+end Transceiver
+
+SpectrumAnalyzer:S_Input_I  N__25 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop Window=2 WindowConstant=0.0 Bias=1 FStart=0.0 Hz FStop=100e9 Hz NumFreqs=0 NPoints=Num/16 Overlap=0 
+TimedSink:T_Out_I  N__17 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop ControlSimulation=1 
+TimedDataWrite:T1  N__16 Start=DefaultTimeStart Stop=DefaultTimeStop RLoad=DefaultRLoad RTemp=DefaultRTemp ControlSimulation=1 FileName="../../Matlab_ADS_Data/ADS_OUTPUT_Q.tim" FileType=0 
+TimedSink:T_PA_Out  N__3 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop ControlSimulation=1 
+TimedSink:T_Input_I  N__25 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop ControlSimulation=1 
+SpectrumAnalyzer:S_Out_I  N__17 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop Window=2 WindowConstant=0.0 Bias=1 FStart=0.0 Hz FStop=100e9 Hz NumFreqs=0 NPoints=Num/16 Overlap=0 
+aele BW=ChipRate;Fchannel=Fc;TStep=1/Fs;Ponits_Num=Num;
+_vKeysightEEsof_dSDF_nConst_lsdfstars:C6  N__1 Level=file{DAC2, "voltage"} 
+#uselib "ckt" , "DAC"
+DAC:DAC_Variable  File="..\Matlab_ADS_Data\ChipRate.txt" Type="gmdif" InterpMode="linear" InterpDom="ri" ExtrapMode="interpMode" iVar1="Index" iVal1=1 
+_vKeysightEEsof_dTSDF_nCxToTimedIQ_ltsdfstars:C3  N__19 N__25 VQ TStep=TStep 
+DefaultNumericStart=0
+DefaultNumericStop=NumStop
+DefaultTimeStart=0 usec
+DefaultTimeStop=TStop
+DefaultSeed=1234567
+DefaultRIn=50 Ohm
+DefaultROut=50 Ohm
+DefaultRLoad=1.0e18 Ohm
+DefaultRTemp=-273.15
+__DefaultPartition=1
+__SimulationID=0
+_vKeysightEEsof_dTSDF_nDF_ltsdf:DF DefaultTimeUnit=3 DefaultSeed=if (DefaultSeed==0) then 0 else (DefaultSeed+__SimulationID) endif DefaultPartition=__DefaultPartition DeadlockManager=0 CktCosimInputs=0 OutputPlan="DF_Output" 
+OutputPlan:DF_Output \
+      Type="Output" \
+      UseSavedEquationNestLevel=yes \
+      SavedEquationNestLevel=2
+
+
+OverSampling=file{DAC_Variable, "OverSampling"}
+Fc=3.5 GHz
+f=Fc
+NumStop=Num
+TStop=Num*TStep
+Num=file{DAC_Variable, "Num"}
+TStep=1/Fs
+Fs=ChipRate*OverSampling
+ChipRate=file{DAC_Variable, "ChipRate"}
+#uselib "ckt" , "DAC"
+DAC:DAC2  File="..\Matlab_ADS_Data\baseband_output_real.tim" Type="tim" InterpMode="linear" InterpDom="ri" ExtrapMode="interpMode" iVar1="time" iVal1=time 
+_vKeysightEEsof_dSDF_nConst_lsdfstars:C5  N__22 Level=file{DAC1, "voltage"} 
+TimedDataWrite:T2  N__17 Start=DefaultTimeStart Stop=DefaultTimeStop RLoad=DefaultRLoad RTemp=DefaultRTemp ControlSimulation=1 FileName="../../Matlab_ADS_Data/ADS_OUTPUT_I.tim" FileType=0 
+#uselib "ckt" , "DAC"
+DAC:DAC1  File="..\Matlab_ADS_Data\baseband_output_imag.tim" Type="tim" InterpMode="linear" InterpDom="ri" ExtrapMode="interpMode" iVar1="time" iVal1=time 
+SpectrumAnalyzer:S_Driver_Input  N__13 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop Window=2 WindowConstant=0.0 Bias=0 FStart=3.46e9 Hz FStop=3.54e9 Hz NumFreqs=0 NPoints=Num/16 Overlap=0 
+OutSelector:O3  N__26 N__13 OutFreq=Fc OutBW=8e7 MHz 
+TimedSink:T_Out_Q  N__16 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop ControlSimulation=1 
+OutSelector:O1  N__7 N__16 OutFreq=0 OutBW=4e7 Hz 
+OutSelector:O2  N__27 N__17 OutFreq=0 OutBW=4e7 Hz 
+SpectrumAnalyzer:S_PA_Out  N__3 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop Window=2 WindowConstant=0.0 Bias=1 FStart=0.0 Hz FStop=100e9 Hz NumFreqs=0 NPoints=Num/16 Overlap=0 
+OutSelector:O4  N__20 N__3 OutFreq=Fc OutBW=8e7 Hz 
+TimedSink:T_Input_Q  VQ Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop ControlSimulation=1 
+
+Options:Options1 Tnom=25 TopologyCheck=yes ForceS_Params=yes V_RelTol=1e-3 V_AbsTol=1e-4 V  \
+I_RelTol=1e-3 I_AbsTol=1e-8 A GiveAllWarnings=yes MaxWarnings=10 ForceM_Params=yes  \
+InitialGuessAnnotation=0 TopologyCheckMessages=no doDeltaAC=no ReduceSPortRatio=0.5 WarnSOA=yes  \
+MaxWarnSOA=5 Census=no MinNodalR=1e-2 Ohm LargeCapThreshold=1e-3 F EnableAssertChecks=no EnableSpareRemoval=yes 
+
+_vKeysightEEsof_dSDF_nRectToCx_lsdfstars:R10  N__1 N__22 N__19 
+
+HB:Env1 Freq[1]=Fc \
+ Order[1]=5 \
+  MaxOrder=4 StatusLevel=1 FundOversample=2 PackFFT=no Restart=no \
+ UseGear=no EnvIntegOrder=1 EnvBandwidth=0.1 EnvWarnPoorFit=yes EnvUsePoorFit=yes \
+ SweepVar="time" DevOpPtLevel=0 EnvFitDisableCache=no SweepPlan="Env1_stim" OutputPlan="Env1_Output"
+
+OutputPlan:Env1_Output \
+       Type="Output" \
+       NodeName[1]="X5.V1" \
+       DeviceCurrentName[1]="X5.P6.pinCurrent.i" \
+       UseNodeNestLevel=yes \
+       NodeNestLevel=2 \
+       UseEquationNestLevel=yes \
+       EquationNestLevel=2 \
+       UseSavedEquationNestLevel=yes \
+       SavedEquationNestLevel=2 \
+       UseDeviceCurrentNestLevel=no \
+       DeviceCurrentNestLevel=0 \
+       DeviceCurrentDeviceType="All" \
+       DeviceCurrentSymSyntax=yes \
+       UseCurrentNestLevel=yes \
+       CurrentNestLevel=999 \
+       UseDeviceVoltageNestLevel=no \
+       DeviceVoltageNestLevel=0 \
+       DeviceVoltageDeviceType="All" 
+
+SweepPlan:Env1_stim Stop=TStop Step=TStep
+
+Tran:Env1_tran HB_Sol=1 SteadyState=1 StatusLevel=3 \
+ Freq[1]=Fc \
+ Order[1]=5 \
+ OutputPlan="Env1_Output"
+
+Component:tahb_Env1 Module="ATAHB" Type="ModelExtractor" Tran_Analysis="Env1_tran" HB_Analysis="Env1"
+
+Transceiver:X1  VQ N__25 N__7 N__27 N__26 N__20 
+SpectrumAnalyzer:S_Input_Q  VQ Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop Window=2 WindowConstant=0.0 Bias=0 FStart=0.0 Hz FStop=4e7 Hz NumFreqs=0 NPoints=Num/16 Overlap=0 
+SpectrumAnalyzer:S_Out_Q  N__16 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop Window=2 WindowConstant=0.0 Bias=1 FStart=0.0 Hz FStop=100e9 Hz NumFreqs=0 NPoints=Num/16 Overlap=0 
+TimedSink:T_Driver_Input  N__13 Plot=0 RLoad=DefaultRLoad RTemp=DefaultRTemp Start=DefaultTimeStart Stop=DefaultTimeStop ControlSimulation=1 

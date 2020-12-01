@@ -1,0 +1,47 @@
+
+hpeesofsim (*) 490.shp Nov 12 2018, MINT version 4
+    (64-bit windows built: Tue Nov 13, 2018 02:20:54 +0000)
+
+`DF': Simulation started. 
+`DF': Scheduling completed in 0 milliseconds (CPU time).
+Warning detected by hpeesofsim during Ptolemy simulation initialization `DF'.
+    `S_Out_Q': Collecting 7 samples less to make the total size 83345.
+    Decreasing Stop time to 0.0010418. Number of segments will be 16.
+
+Warning detected by hpeesofsim during Ptolemy simulation initialization `DF'.
+    `S_Input_Q': Collecting 7 samples less to make the total size 83345.
+    Decreasing Stop time to 0.0010418. Number of segments will be 16.
+
+Warning detected by hpeesofsim during Ptolemy simulation initialization `DF'.
+    `S_PA_Out': Collecting 7 samples less to make the total size 83345.
+    Decreasing Stop time to 0.0010418. Number of segments will be 16.
+
+Warning detected by hpeesofsim during Ptolemy simulation initialization `DF'.
+    `S_Driver_Input': Collecting 7 samples less to make the total size
+    83345. Decreasing Stop time to 0.0010418. Number of segments will be
+    16.
+
+Warning detected by hpeesofsim during Ptolemy simulation initialization `DF'.
+    `S_Out_I': Collecting 7 samples less to make the total size 83345.
+    Decreasing Stop time to 0.0010418. Number of segments will be 16.
+
+Warning detected by hpeesofsim during Ptolemy simulation initialization `DF'.
+    `S_Input_I': Collecting 7 samples less to make the total size 83345.
+    Decreasing Stop time to 0.0010418. Number of segments will be 16.
+
+Warning detected by hpeesofsim in topology check during circuit set up.
+    Number of nodes with only one device attached (topology corrected): 2
+    Number of nodes with no DC path to ground (topology corrected): 8
+
+Pt DC convergence is used.
+
+COMPONENT : X1.LINK2.CMP1 envelope bandwidth characterization
+
+COMPONENT : X1.ISO1.CMP1 envelope bandwidth characterization
+Device Pin Current not saved for multiple pins of devices
+ connected together in circuit. Use a current probe instead.
+`DF': Simulation completed in 31 seconds (CPU time).
+
+Resource usage:
+  Total stopwatch time     =    31.82 seconds.
+
